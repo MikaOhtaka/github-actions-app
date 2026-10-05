@@ -1,0 +1,23 @@
+name: CI
+
+# いつ動かすか: main への push と プルリクエスト時
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch: # GitHub画面から手動実行もできる
+
+jobs:
+  test:
+    runs-on: ubuntu-latest # GitHubが用意する仮想マシン
+    steps:
+      - name: コードを取得
+        uses: actions/checkout@v4
+
+      - name: Node.js をセットアップ
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: テストを実行
+        run: npm test
