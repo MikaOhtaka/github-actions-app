@@ -21,3 +21,36 @@ jobs:
 
       - name: テストを実行
         run: npm test
+
+  # test が成功し、かつ main への push（＝マージ）のときだけ GitHub Pages にデプロイする
+  deploy:
+    needs: test
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read # コードを取得する権限（permissions を書くと未指定の権限は無しになるため明記）
+      pages: write # Pages にデプロイする権限
+      id-token: write # デプロイ時の本人確認に使う
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }} # 公開URLを実行結果に表示する
+    steps:
+      - name: コードを取得
+        uses: actions/checkout@v4
+
+      - name: 公開するファイルだけを集める
+        run: |
+          mkdir _site
+          cp index.html _site/
+
+      - name: Pages の設定を読み込む
+        uses: actions/configure-pages@v5
+
+      - name: 公開ファイルをアップロード
+        uses: actions/upload-pages-artifact@v4
+        with:
+          path: _site
+
+      - name: Pages にデプロイ
+        id: deployment
+        uses: actions/deploy-pages@v4
