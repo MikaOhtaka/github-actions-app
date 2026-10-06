@@ -2,8 +2,10 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { createServer } from "./server.js";
 
-test("GET / で index.html が返る", async () => {
+test("GET / で index.html が返る", async (t) => {
   const server = createServer().listen(0); // 0 = 空いているポートを自動で使う
+  // assert が失敗しても必ずサーバーを止める（止めないとプロセスが終了せずテストが終わらない）
+  t.after(() => server.close());
   const { port } = server.address();
 
   const res = await fetch(`http://localhost:${port}/`);
@@ -12,6 +14,4 @@ test("GET / で index.html が返る", async () => {
   assert.equal(res.status, 200);
   assert.match(res.headers.get("content-type"), /text\/html/);
   assert.match(body, /<h1>Hello, GitHub Actions!<\/h1>/);
-
-  server.close();
 });
