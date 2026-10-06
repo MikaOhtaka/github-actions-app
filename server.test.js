@@ -1,5 +1,6 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { readFile } from "node:fs/promises";
 import { createServer } from "./server.js";
 
 test("GET / で index.html が返る", async (t) => {
@@ -13,5 +14,8 @@ test("GET / で index.html が返る", async (t) => {
 
   assert.equal(res.status, 200);
   assert.match(res.headers.get("content-type"), /text\/html/);
-  assert.match(body, /<h1>Hello, GitHub Actions!<\/h1>/);
+
+  // 文言はチェックせず、index.html ファイルそのものが返っているかだけを見る
+  const expected = await readFile(new URL("./index.html", import.meta.url), "utf8");
+  assert.equal(body, expected);
 });
