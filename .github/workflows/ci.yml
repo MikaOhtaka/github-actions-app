@@ -10,6 +10,7 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest # GitHubが用意する仮想マシン
+    timeout-minutes: 5 # 万一止まらなくても5分で打ち切る（デフォルトは360分）
     steps:
       - name: コードを取得
         uses: actions/checkout@v4
@@ -27,6 +28,7 @@ jobs:
     needs: test
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     permissions:
       contents: read # コードを取得する権限（permissions を書くと未指定の権限は無しになるため明記）
       pages: write # Pages にデプロイする権限
